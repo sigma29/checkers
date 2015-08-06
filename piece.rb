@@ -3,103 +3,121 @@ require 'colorize'
 require_relative 'board'
 
 class Piece
-  UP_DELTAS = [
-    [-1, 1],
-    [ 1, 1]
-  ]
-  DOWN_DELTAS = [
-    [ 1,-1],
-    [-1,-1]
-  ]
   PIECE_DELTAS = {
-    :red => UP_DELTAS,
-    :black => DOWN_DELTAS
-  }
+    :red => [
+            [-1, 1],
+            [ 1, 1]
+          ],
+    :black => [
+              [ 1,-1],
+              [-1,-1]
+              ]
+            }
 
   Y_COORD_FOR_KING = {
     :red => 7,
     :black => 0
   }
 
+  JUMP_DISTANCE = 2
+
   attr_reader :color, :board
   attr_accessor :position
-  attr_writer :is_king
+  attr_writer :king
 
   def initialize(color,position,board)
     @color, @position, @board = color, position, board
-    @is_king = false
+    @king = false
     board.add_piece(position,self)
   end
 
-  def is_king?
-    @is_king
+  def king?
+    @king
   end
 
-  def perform_slide(end_pos)
-    return false unless slide_positions.include?(end_pos)
+  def perform_slide(end_position)
+    return false unless move_positions.include?(end_position)
 
-    board[position] = nil
-    self.position = end_pos
-    board[end_pos] = self
-    self.is_king = true if make_king?
+    make_move(end_position)
 
     true
   end
 
-  #private
+  def perform_jump(end_position)
+    return false unless move_positions(JUMP_DISTANCE).include?(end_position)
+    midpoint = middle_position(position,end_position)
+    return false unless board.has_opponent_piece?(midpoint,color)
 
-  def move_diffs
-    if is_king?
-      UP_DELTAS + DOWN_DELTAS
+    board.remove_piece(midpoint)
+    make_move(end_position)
+
+    true
+  end
+
+
+  def inspect
+    {
+      :position => position,
+      :color => color,
+      :king => king?
+    }.inspect
+  end
+
+  def render
+    if king?
+      color == :red ? "K".colorize(:red) : "K"
     else
-      PIECE_DELTAS[color]
+      color == :red ? "O".colorize(:red) : "O"
     end
   end
 
-  def slide_positions
-    x, y = position
-
-    move_diffs.each_with_object([]) do |(dx, dy), moves|
-      new_pos = [x + dx, y + dy]
-      next unless board.available?(new_pos)
-      moves << new_pos
-    end
-  end
-
-  def jump_positions
-    x, y = position
-
-    move_diffs.each_with_object([]) do |(dx, dy), moves|
-      middle_pos = [x + dx, y + dy]
-      new_pos = [x + 2 * dx, y + 2 * dy]
-      next unless board.available?(new_pos)
-      next unless board.has_opponent_piece?(middle_pos,color)
-      moves << new_pos
-    end
-  end
-
+  private
   def make_king?
-    return false if is_king?
+    return false if king?
 
     _, y = position
 
     y == Y_COORD_FOR_KING[color]
   end
 
-  def inspect
-    {
-      :position => position,
-      :color => color,
-      :is_king => is_king?
-    }.inspect
+  def make_move(end_position)
+    board[position] = nil
+    self.position = end_position
+    board[end_position] = self
+    self.is_king = true if make_king?
+
+    self
   end
 
-  def render
-    if is_king?
-      color == :red ? "K".colorize(:red) : "K"
+  def move_diffs
+    if king?
+      PIECE_DELTAS[:black] + PIECE_DELTAS[:red]
     else
-      color == :red ? "O".colorize(:red) : "O"
+      PIECE_DELTAS[color]
     end
   end
+
+  def move_positions(distance = 1)
+    x, y = position
+    moves = []
+
+    move_diffs.each do |(dx, dy)|
+      new_position = [x + distance * dx, y + distance * dy]
+      next unless board.available?(new_position)
+      moves << new_position
+    end
+
+    moves
+  end
+
+  def middle_position(start_position, end_position)
+    start_x, start_y = start_position
+    end_x, end_y = end_position
+    middle_x = (start_x + end_x) / 2
+    middle_y = (start_y + end_y) / 2
+
+    [middle_x, middle_y]
+  end
+
 
 end
