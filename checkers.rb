@@ -3,7 +3,7 @@ require_relative 'piece'
 require_relative 'board'
 
 class Checkers
-  attr_reader :board
+  attr_reader :board, :red, :black
   attr_accessor :current_player
 
   def initialize
@@ -29,8 +29,7 @@ class Checkers
   def take_turn
     begin
       move_sequence = current_player.move_input
-      puts "Move sequence: #{move_sequence}"
-      board.make_moves(move_sequence)
+      board.make_moves(move_sequence, current_player.color)
     rescue InvalidMoveError => e
       puts e.message
       retry
@@ -38,11 +37,11 @@ class Checkers
   end
 
   def opponent
-    (current_player == red) ? :black : :red
+    (current_player == red) ? black : red
   end
 
   def swap_player
-    self.current_player = (current_player == red) ? :black : :red
+    self.current_player = (current_player == red) ? black : red
   end
 
 end
@@ -50,12 +49,26 @@ end
 class HumanPlayer
   attr_reader :color
 
-  def initialize(color)
+  def initialize(color,board)
     @color = color
+    #board passed for duck typing
   end
 
   def move_input
-    puts "Enter your desired move sequence"
-    gets.chomp
+    puts "#{color.capitalize}, enter a move sequence in the format x,y:x,y:x,y"
+    position_chunks = gets.chomp.split(":")
+    move_sequence = []
+
+    position_chunks.each do |chunk|
+      begin
+        x, y = chunk.split(",").map { |coord| Integer(coord)}
+      rescue ArgumentError
+        raise InvalidMoveError
+      else
+        move_sequence << [x,y]
+      end
+    end
+
+    move_sequence
   end
 end
