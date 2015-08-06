@@ -32,14 +32,21 @@ class Board
     grid[x][y] = value
   end
 
-  def make_moves(move_sequence)
+  def make_moves(move_sequence,color)
     start_pos = move_sequence.shift
-    unless start_pos.all? { |coord| coord.class == Fixnum }
-      raise InvalidMoveError
+    if !Board.on_board?(start_pos)
+      raise InvalidMoveError.new("Error: Invalid start position")
+    elsif has_opponent_piece?(start_pos,color)
+      raise InvalidMoveError.new("Error: Not your piece!")
     end
-    raise InvalidMoveError unless Board.on_board?(start_pos)
+
     piece = self[start_pos]
-    piece.perform_moves(move_sequence)
+    if piece.nil?
+      raise InvalidMoveError.new("Error: No piece at start position")
+    end
+
+    must_capture = can_capture?(color)
+    piece.perform_moves(move_sequence,must_capture)
   end
 
   def dup
@@ -78,13 +85,32 @@ class Board
     color_pieces(color).none? { |piece| piece.can_move?}
   end
 
+  def capture_available?(color)
+    color_pieces(color).any? {|piece| piece.can_capture?}
+  end
+
+  def render
+    display_board = grid.transpose.reverse
+    display_board.each_with_index do |row, row_num|
+      print "#{BOARD_SIZE - row_num - 1}  "
+      row.each_with_index do |element,col_num|
+        row_col_sum = row_num + col_num
+        if element
+          print " #{element.render} ".tileize(row_col_sum)
+        else
+          print "   ".tileize(row_col_sum)
+        end
+      end
+      print "\n"
+    end
+    puts "    0  1  2  3  4  5  6  7"
+  end
+
   def color_pieces(color)
     pieces.select {|piece| piece.color == color}
   end
 
-  def can_capture?(color)
-    color_pieces(color).any? {|piece| piece.can_capture?}
-  end
+  private
 
 
 
@@ -104,23 +130,6 @@ class Board
     end
 
     self
-  end
-
-  def render
-    display_board = grid.transpose.reverse
-    display_board.each_with_index do |row, row_num|
-      print "#{BOARD_SIZE - row_num - 1}  "
-      row.each_with_index do |element,col_num|
-        row_col_sum = row_num + col_num
-        if element
-          print " #{element.render} ".tileize(row_col_sum)
-        else
-          print "   ".tileize(row_col_sum)
-        end
-      end
-      print "\n"
-    end
-    puts "    0  1  2  3  4  5  6  7"
   end
 
 end
