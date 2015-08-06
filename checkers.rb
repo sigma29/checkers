@@ -20,6 +20,7 @@ class Checkers
       board.render
       take_turn
       swap_player
+      sleep(1)
     end
 
     board.render

@@ -1,4 +1,3 @@
-require 'byebug'
 require 'colorize'
 require_relative 'board'
 
@@ -96,6 +95,16 @@ class Piece
     end
   end
 
+  def perform_jump(end_position)
+    return false unless jump_positions.include?(end_position)
+    midpoint = middle_position(position,end_position)
+
+    board.remove_piece(midpoint)
+    make_move(end_position)
+
+    true
+  end
+
   protected
 
   def perform_moves!(move_sequence, must_capture)
@@ -158,16 +167,6 @@ class Piece
   def perform_slide(end_position)
     return false unless move_positions.include?(end_position)
 
-    make_move(end_position)
-
-    true
-  end
-
-  def perform_jump(end_position)
-    return false unless jump_positions.include?(end_position)
-    midpoint = middle_position(position,end_position)
-
-    board.remove_piece(midpoint)
     make_move(end_position)
 
     true
