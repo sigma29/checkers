@@ -38,6 +38,19 @@ class Piece
     @king
   end
 
+  def valid_move_sequence?(move_sequence)
+    begin
+      temp_board = board.dup
+      mirror_piece = temp_board[position]
+      mirror_piece.perform_moves!(move_sequence)
+    rescue InvalidMoveError
+      false
+    else
+      true
+    end
+
+  end
+
   def perform_slide(end_position)
     return false unless move_positions.include?(end_position)
 
@@ -57,7 +70,6 @@ class Piece
     true
   end
 
-
   def inspect
     {
       :position => position,
@@ -74,24 +86,23 @@ class Piece
     end
   end
 
+  protected
+
+  def perform_moves!(move_sequence)
+    if move_sequence.length == 1
+      move = move_sequence.first
+      raise InvalidMoveError unless perform_slide(move) || perform_jump(move)
+    else
+      until move_sequence.empty?
+        curr_move = move_sequence.shift
+        raise InvalidMoveError unless perform_jump(curr_move)
+      end
+    end
+
+    true
+  end
+
   private
-  def make_king?
-    return false if king?
-
-    _, y = position
-
-    y == Y_COORD_FOR_KING[color]
-  end
-
-  def make_move(end_position)
-    board[position] = nil
-    self.position = end_position
-    board[end_position] = self
-    self.is_king = true if make_king?
-
-    self
-  end
-
   def move_diffs
     if king?
       PIECE_DELTAS[:black] + PIECE_DELTAS[:red]
@@ -113,6 +124,23 @@ class Piece
     moves
   end
 
+  def make_king?
+    return false if king?
+
+    _, y = position
+
+    y == Y_COORD_FOR_KING[color]
+  end
+
+  def make_move(end_position)
+    board[position] = nil
+    self.position = end_position
+    board[end_position] = self
+    self.is_king = true if make_king?
+
+    self
+  end
+
   def middle_position(start_position, end_position)
     start_x, start_y = start_position
     end_x, end_y = end_position
@@ -123,4 +151,7 @@ class Piece
   end
 
 
+end
+
+class InvalidMoveError < StandardError
 end
