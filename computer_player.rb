@@ -1,5 +1,5 @@
 require 'byebug'
-
+require_relative 'future_moves_tree'
 
 class ComputerPlayer
   attr_reader :color, :board
@@ -12,7 +12,7 @@ class ComputerPlayer
   def move_input
     move_sequence = []
 
-    if board.can_capture?(color)
+    if board.capture_available?(color)
       jumpable_pieces = board.color_pieces(color).select(&:can_capture?)
       piece = jumpable_pieces.sample
       move_sequence << piece.position
@@ -31,4 +31,7 @@ class ComputerPlayer
 
     move_sequence
   end
+
+
+
 end

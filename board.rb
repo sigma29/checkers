@@ -45,7 +45,7 @@ class Board
       raise InvalidMoveError.new("Error: No piece at start position")
     end
 
-    must_capture = can_capture?(color)
+    must_capture = capture_available?(color)
     piece.perform_moves(move_sequence,must_capture)
   end
 
