@@ -38,12 +38,12 @@ class Piece
     @king
   end
 
-  def perform_move(move_sequence, must_capture)
+  def perform_moves(move_sequence, must_capture = false)
     unless valid_move_sequence?(move_sequence,must_capture)
        raise InvalidMoveError
     end
 
-    perform_move!(move_sequence, must_capture)
+    perform_moves!(move_sequence, must_capture)
   end
 
   def inspect
@@ -63,15 +63,38 @@ class Piece
   end
 
   def can_capture?
-    move_positions(2).any? {|end_pos| jumps_over_opponent?(end_pos)}
+    move_positions(JUMP_DISTANCE).any? {|end_pos| jumps_over_opponent?(end_pos)}
   end
 
   def can_move?
     can_capture? || can_slide?
   end
 
+  def can_slide?
+    !move_positions.empty?
+  end
 
+  def move_positions(distance = 1)
+    x, y = position
+    moves = []
 
+    move_diffs.each do |(dx, dy)|
+      new_position = [x + distance * dx, y + distance * dy]
+      next unless board.available?(new_position)
+      moves << new_position
+    end
+
+    moves
+  end
+
+  def jump_positions
+    targets = move_positions(JUMP_DISTANCE)
+    targets.select do |target_pos|
+      midpoint = middle_position(position,target_pos)
+      #must be jumping over someone
+      board.has_opponent_piece?(midpoint,color)
+    end
+  end
 
   protected
 
@@ -79,7 +102,7 @@ class Piece
     if move_sequence.length == 1
       move = move_sequence.first
       if perform_slide(move)
-        raise InvalidMoveError if must_capture
+        raise InvalidMoveError.new if must_capture
       elsif perform_jump(move)
       else
         raise InvalidMoveError
@@ -103,23 +126,6 @@ class Piece
     end
   end
 
-  def can_slide?
-    !move_positions.empty?
-  end
-
-  def move_positions(distance = 1)
-    x, y = position
-    moves = []
-
-    move_diffs.each do |(dx, dy)|
-      new_position = [x + distance * dx, y + distance * dy]
-      next unless board.available?(new_position)
-      moves << new_position
-    end
-
-    moves
-  end
-
   def make_king?
     return false if king?
 
@@ -132,7 +138,7 @@ class Piece
     board[position] = nil
     self.position = end_position
     board[end_position] = self
-    self.is_king = true if make_king?
+    self.king = true if make_king?
 
     self
   end
@@ -158,9 +164,8 @@ class Piece
   end
 
   def perform_jump(end_position)
-    return false unless move_positions(JUMP_DISTANCE).include?(end_position)
+    return false unless jump_positions.include?(end_position)
     midpoint = middle_position(position,end_position)
-    return false unless board.has_opponent_piece?(midpoint,color)
 
     board.remove_piece(midpoint)
     make_move(end_position)
@@ -182,7 +187,6 @@ class Piece
 
     [middle_x, middle_y]
   end
-
 
 end
 
