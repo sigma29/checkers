@@ -38,10 +38,12 @@ class Piece
     @king
   end
 
-  def perform_move(move_sequence)
-    raise InvalidMoveError unless valid_move_sequence?(move_sequence)
+  def perform_move(move_sequence, must_capture)
+    unless valid_move_sequence?(move_sequence,must_capture)
+       raise InvalidMoveError
+    end
 
-    perform_move!(move_sequence)
+    perform_move!(move_sequence, must_capture)
   end
 
   def inspect
@@ -66,10 +68,15 @@ class Piece
 
   protected
 
-  def perform_moves!(move_sequence)
+  def perform_moves!(move_sequence, must_capture)
     if move_sequence.length == 1
       move = move_sequence.first
-      raise InvalidMoveError unless perform_slide(move) || perform_jump(move)
+      if perform_slide(move)
+        raise InvalidMoveError if must_capture
+      elsif perform_jump(move)
+      else
+        raise InvalidMoveError
+      end
     else
       until move_sequence.empty?
         curr_move = move_sequence.shift
@@ -119,11 +126,11 @@ class Piece
     self
   end
 
-  def valid_move_sequence?(move_sequence)
+  def valid_move_sequence?(move_sequence, must_capture)
     begin
       temp_board = board.dup
       mirror_piece = temp_board[position]
-      mirror_piece.perform_moves!(move_sequence)
+      mirror_piece.perform_moves!(move_sequence, must_capture)
     rescue InvalidMoveError
       false
     else
