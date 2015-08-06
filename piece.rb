@@ -14,6 +14,12 @@ class Piece
     :red => UP_DELTAS,
     :black => DOWN_DELTAS
   }
+
+  Y_COORD_FOR_KING = {
+    :red => 7,
+    :black => 0
+  }
+
   attr_reader :color, :board
   attr_accessor :position
   attr_writer :is_king
@@ -30,9 +36,11 @@ class Piece
 
   def perform_slide(end_pos)
     return false unless slide_positions.include?(end_pos)
+
     board[position] = nil
     self.position = end_pos
     board[end_pos] = self
+    self.is_king = true if make_king?
 
     true
   end
@@ -55,6 +63,34 @@ class Piece
       next unless board.available?(new_pos)
       moves << new_pos
     end
+  end
+
+  def jump_positions
+    x, y = position
+
+    move_diffs.each_with_object([]) do |(dx, dy), moves|
+      middle_pos = [x + dx, y + dy]
+      new_pos = [x + 2 * dx, y + 2 * dy]
+      next unless board.available?(new_pos)
+      next unless board.has_opponent_piece?(middle_pos,color)
+      moves << new_pos
+    end
+  end
+
+  def make_king?
+    return false if is_king?
+
+    _, y = position
+
+    y == Y_COORD_FOR_KING[color]
+  end
+
+  def inspect
+    {
+      :position => position,
+      :color => color,
+      :is_king => is_king?
+    }.inspect
   end
 
 end
