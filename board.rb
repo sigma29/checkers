@@ -33,7 +33,12 @@ class Board
   end
 
   def make_moves(move_sequence)
-    piece = self[move_sequence.shift]
+    start_pos = move_sequence.shift
+    unless start_pos.all? { |coord| coord.class == Fixnum }
+      raise InvalidMoveError
+    end
+    raise InvalidMoveError unless Board.on_board?(start_pos)
+    piece = self[start_pos]
     piece.perform_moves(move_sequence)
   end
 
@@ -105,11 +110,12 @@ class Board
     display_board = grid.transpose.reverse
     display_board.each_with_index do |row, row_num|
       print "#{BOARD_SIZE - row_num - 1}  "
-      row.each do |element|
+      row.each_with_index do |element,col_num|
+        row_col_sum = row_num + col_num
         if element
-          print " #{element.render} "
+          print " #{element.render} ".tileize(row_col_sum)
         else
-          print " _ "
+          print "   ".tileize(row_col_sum)
         end
       end
       print "\n"
@@ -117,4 +123,14 @@ class Board
     puts "    0  1  2  3  4  5  6  7"
   end
 
+end
+
+class String
+  def tileize(sum)
+    if sum % 2 == 0
+      self.colorize( :background => :light_black )
+    else
+      self.colorize( :background => :red )
+    end
+  end
 end
