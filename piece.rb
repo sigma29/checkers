@@ -60,6 +60,10 @@ class Piece
     end
   end
 
+  def can_capture?
+    move_positions(2).any? {|end_pos| jumps_over_opponent?(end_pos)}
+  end
+
   protected
 
   def perform_moves!(move_sequence)
@@ -144,6 +148,12 @@ class Piece
     make_move(end_position)
 
     true
+  end
+
+  def jumps_over_opponent?(end_position)
+    midpoint = middle_position(position,end_position)
+
+    board.has_opponent_piece?(midpoint,color)
   end
 
   def middle_position(start_position, end_position)
