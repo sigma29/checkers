@@ -66,6 +66,13 @@ class Piece
     move_positions(2).any? {|end_pos| jumps_over_opponent?(end_pos)}
   end
 
+  def can_move?
+    can_capture? || can_slide?
+  end
+
+
+
+
   protected
 
   def perform_moves!(move_sequence, must_capture)
@@ -94,6 +101,10 @@ class Piece
     else
       PIECE_DELTAS[color]
     end
+  end
+
+  def can_slide?
+    !move_positions.empty?
   end
 
   def move_positions(distance = 1)
