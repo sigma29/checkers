@@ -3,6 +3,10 @@ require_relative 'piece'
 
 class Board
   BOARD_SIZE = 8
+  def self.on_board?(pos)
+    pos.all? { |coordinate| coordinate.between?(0, BOARD_SIZE - 1) }
+  end
+
   attr_accessor :grid
 
   def initialize
@@ -22,5 +26,15 @@ class Board
     x,y = pos
     grid[x][y] = value
   end
+
+  def empty?(pos)
+    self[pos] == nil
+  end
+
+  def has_opponent_piece?(pos,color)
+    !empty?(pos) && self[pos].color != color
+  end
+
+
 
 end

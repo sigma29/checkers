@@ -6,3 +6,7 @@ p1 = Piece.new(:black,[4,4],b)
 p p1.move_diffs
 p1.is_king = true
 p p1.move_diffs
+b.empty?([4,4])
+b.empty?([5,4])
+Board.on_board?([4,4])
+Board.on_board?([8,1])
