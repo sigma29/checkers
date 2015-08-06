@@ -4,9 +4,8 @@ load 'piece.rb'
 b = Board.new
 p1 = Piece.new(:black,[4,4],b)
 p p1.move_diffs
+p p1.slide_positions
 p1.is_king = true
 p p1.move_diffs
-b.empty?([4,4])
-b.empty?([5,4])
-Board.on_board?([4,4])
-Board.on_board?([8,1])
+b.available?([4,4])
+p p1.slide_positions

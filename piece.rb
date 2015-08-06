@@ -28,6 +28,13 @@ class Piece
     @is_king
   end
 
+  def perform_slide(end_pos)
+
+
+  end
+
+  #private
+
   def move_diffs
     if is_king?
       UP_DELTAS + DOWN_DELTAS
@@ -35,4 +42,15 @@ class Piece
       PIECE_DELTAS[color]
     end
   end
+
+  def slide_positions
+    x, y = position
+
+    move_diffs.each_with_object([]) do |(dx, dy), moves|
+      new_pos = [x + dx, y + dy]
+      next unless board.available?(new_pos)
+      moves << new_pos
+    end
+  end
+  
 end
