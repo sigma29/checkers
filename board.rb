@@ -9,6 +9,10 @@ class Board
     @grid = Array.new(BOARD_SIZE) { Array.new(BOARD_SIZE) }
   end
 
+  def add_piece(pos,piece)
+    self[pos] = piece
+  end
+
   def [](pos)
     x, y = pos
     grid[x][y]
@@ -18,5 +22,5 @@ class Board
     x,y = pos
     grid[x][y] = value
   end
-  
+
 end

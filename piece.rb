@@ -21,6 +21,7 @@ class Piece
   def initialize(color,position,board)
     @color, @position, @board = color, position, board
     @is_king = false
+    board.add_piece(position,self)
   end
 
   def is_king?
