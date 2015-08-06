@@ -38,36 +38,10 @@ class Piece
     @king
   end
 
-  def valid_move_sequence?(move_sequence)
-    begin
-      temp_board = board.dup
-      mirror_piece = temp_board[position]
-      mirror_piece.perform_moves!(move_sequence)
-    rescue InvalidMoveError
-      false
-    else
-      true
-    end
+  def perform_move(move_sequence)
+    raise InvalidMoveError unless valid_move_sequence?(move_sequence)
 
-  end
-
-  def perform_slide(end_position)
-    return false unless move_positions.include?(end_position)
-
-    make_move(end_position)
-
-    true
-  end
-
-  def perform_jump(end_position)
-    return false unless move_positions(JUMP_DISTANCE).include?(end_position)
-    midpoint = middle_position(position,end_position)
-    return false unless board.has_opponent_piece?(midpoint,color)
-
-    board.remove_piece(midpoint)
-    make_move(end_position)
-
-    true
+    perform_move!(move_sequence)
   end
 
   def inspect
@@ -139,6 +113,37 @@ class Piece
     self.is_king = true if make_king?
 
     self
+  end
+
+  def valid_move_sequence?(move_sequence)
+    begin
+      temp_board = board.dup
+      mirror_piece = temp_board[position]
+      mirror_piece.perform_moves!(move_sequence)
+    rescue InvalidMoveError
+      false
+    else
+      true
+    end
+  end
+
+  def perform_slide(end_position)
+    return false unless move_positions.include?(end_position)
+
+    make_move(end_position)
+
+    true
+  end
+
+  def perform_jump(end_position)
+    return false unless move_positions(JUMP_DISTANCE).include?(end_position)
+    midpoint = middle_position(position,end_position)
+    return false unless board.has_opponent_piece?(midpoint,color)
+
+    board.remove_piece(midpoint)
+    make_move(end_position)
+
+    true
   end
 
   def middle_position(start_position, end_position)
