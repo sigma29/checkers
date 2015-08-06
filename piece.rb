@@ -1,4 +1,5 @@
 require 'byebug'
+require 'colorize'
 require_relative 'board'
 
 class Piece
@@ -91,6 +92,14 @@ class Piece
       :color => color,
       :is_king => is_king?
     }.inspect
+  end
+
+  def render
+    if is_king?
+      color == :red ? "K".colorize(:red) : "K"
+    else
+      color == :red ? "O".colorize(:red) : "O"
+    end
   end
 
 end
