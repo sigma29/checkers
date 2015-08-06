@@ -17,6 +17,10 @@ class Board
     self[pos] = piece
   end
 
+  def remove_piece(pos)
+    self[pos] = nil
+  end
+
   def [](pos)
     x, y = pos
     grid[x][y]
