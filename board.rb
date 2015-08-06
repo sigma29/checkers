@@ -32,6 +32,11 @@ class Board
     grid[x][y] = value
   end
 
+  def make_moves(move_sequence)
+    piece = self[move_sequence.shift]
+    piece.perform_moves(move_sequence)
+  end
+
   def dup
     new_board = Board.new
     pieces.each {|piece| piece.dup(new_board)}
