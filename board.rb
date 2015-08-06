@@ -54,6 +54,11 @@ class Board
     grid.flatten.compact
   end
 
+  def can_capture?(color)
+    color_pieces = pieces.select {|piece| piece.color == color}
+    color_pieces.any? {|piece| piece.can_capture?}
+  end
+
   def render
     display_board = grid.transpose.reverse
     display_board.each_with_index do |row, row_num|
