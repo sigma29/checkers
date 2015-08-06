@@ -43,6 +43,20 @@ class Board
     !empty?(pos) && self[pos].color != color
   end
 
-
+  def render
+    display_board = grid.transpose.reverse
+    display_board.each_with_index do |row, row_num|
+      print "#{BOARD_SIZE - row_num - 1}  "
+      row.each do |element|
+        if element
+          print " #{element.render} "
+        else
+          print " _ "
+        end
+      end
+      print "\n"
+    end
+    puts "    0  1  2  3  4  5  6  7"
+  end
 
 end
