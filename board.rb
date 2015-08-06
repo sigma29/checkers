@@ -35,6 +35,10 @@ class Board
     self[pos] == nil
   end
 
+  def available?(pos)
+    Board.on_board?(pos) && empty?(pos)
+  end
+
   def has_opponent_piece?(pos,color)
     !empty?(pos) && self[pos].color != color
   end
