@@ -1,6 +1,7 @@
 require 'byebug'
 require_relative 'piece'
 require_relative 'board'
+require_relative 'computer_player'
 
 class Checkers
   attr_reader :board, :red, :black
@@ -8,8 +9,8 @@ class Checkers
 
   def initialize
     @board = Board.new(true)
-    @red = HumanPlayer.new(:red)
-    @black = HumanPlayer.new(:black)
+    @red = ComputerPlayer.new(:red,board)
+    @black = ComputerPlayer.new(:black,board)
     @current_player = @black
   end
 
@@ -21,6 +22,7 @@ class Checkers
       swap_player
     end
 
+    board.render
     puts "#{opponent.color.upcase} won!"
   end
 
@@ -49,7 +51,7 @@ end
 class HumanPlayer
   attr_reader :color
 
-  def initialize(color,board)
+  def initialize(color,board = nil)
     @color = color
     #board passed for duck typing
   end
