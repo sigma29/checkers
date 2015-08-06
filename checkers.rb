@@ -6,11 +6,20 @@ class Checkers
   attr_reader :board
   attr_accessor :current_player
 
-  def initialize()
+  def initialize
     @board = Board.new(true)
-    @red_player = HumanPlayer.new(:red)
-    @black_player = HumanPlayer.new(:black)
+    @red = HumanPlayer.new(:red)
+    @black = HumanPlayer.new(:black)
     @current_player = black_player
+  end
+
+
+  def opponent
+    (current_player == red) ? :black : :red
+  end
+
+  def swap_player
+    self.current_player = (current_player == red) ? :black : :red
   end
 end
 
@@ -20,5 +29,5 @@ class HumanPlayer
   def initialize(color)
     @color = color
   end
-  
+
 end
