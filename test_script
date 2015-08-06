@@ -5,6 +5,9 @@ b = Board.new
 p1 = Piece.new(:black,[4,4],b)
 p p1.move_diffs
 p p1.slide_positions
+p p1.perform_slide([1,1])
+p p1.perform_slide([5,3])
+p b
 p1.is_king = true
 p p1.move_diffs
 b.available?([4,4])

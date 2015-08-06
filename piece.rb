@@ -29,8 +29,12 @@ class Piece
   end
 
   def perform_slide(end_pos)
+    return false unless slide_positions.include?(end_pos)
+    board[position] = nil
+    self.position = end_pos
+    board[end_pos] = self
 
-
+    true
   end
 
   #private
@@ -52,5 +56,5 @@ class Piece
       moves << new_pos
     end
   end
-  
+
 end
