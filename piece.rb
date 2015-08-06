@@ -25,10 +25,13 @@ class Piece
   attr_accessor :position
   attr_writer :king
 
-  def initialize(color,position,board)
-    @color, @position, @board = color, position, board
-    @king = false
+  def initialize(color,position,board,king = false)
+    @color, @position, @board, @king = color, position, board, king
     board.add_piece(position,self)
+  end
+
+  def dup(new_board)
+    Piece.new(color,position,new_board,king?)
   end
 
   def king?
