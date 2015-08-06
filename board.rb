@@ -63,10 +63,20 @@ class Board
     grid.flatten.compact
   end
 
-  def can_capture?(color)
-    color_pieces = pieces.select {|piece| piece.color == color}
-    color_pieces.any? {|piece| piece.can_capture?}
+  def lost?(color)
+    color_pieces(color).empty? ||
+    color_pieces(color).none? { |piece| piece.can_move?}
   end
+
+  def color_pieces(color)
+    pieces.select {|piece| piece.color == color}
+  end
+
+  def can_capture?(color)
+    color_pieces(color).any? {|piece| piece.can_capture?}
+  end
+
+
 
   def setup_board
     COLOR_ROWS.each do |color, rows|
