@@ -1,4 +1,5 @@
 require 'byebug'
+require_relative 'board'
 
 class Piece
   attr_reader :color, :board
@@ -9,7 +10,7 @@ class Piece
     @color, @position, @board = color, position, board
     @is_king = false
   end
-  
+
   def is_king?
     @is_king
   end
