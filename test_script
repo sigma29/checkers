@@ -1,0 +1,8 @@
+load 'board.rb'
+load 'piece.rb'
+
+b = Board.new
+p1 = Piece.new(:black,[4,4],b)
+p p1.move_diffs
+p1.is_king = true
+p p1.move_diffs
